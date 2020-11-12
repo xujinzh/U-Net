@@ -6,7 +6,7 @@
 
 # 代码使用方法
 1. git clone https://github.com/xujinzh/U-Net.git
-2. python main.py --train .\data\membrane\train --test .\data\membrane\test
+2. python main.py --train ./data/membrane/train --test ./data/membrane/test
 
 数据使用的是 [ISBI Challenge: Segmentation of neuronal structures in EM stacks
 ](http://brainiac2.mit.edu/isbi_challenge/).
