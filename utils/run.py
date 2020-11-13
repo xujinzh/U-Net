@@ -21,8 +21,10 @@ def just_do_it():
     """
     # 构造参数解析
     ap = argparse.ArgumentParser()
-    ap.add_argument("-a", "--train", required=True, default="data/membrane/train/", help="path to train data set")
-    ap.add_argument('-t', '--test', required=True, default='data/membrane/test/', help='path to test data set')
+    ap.add_argument('-a', '--train', required=False, default='data/membrane/train/', help='path to train data set')
+    ap.add_argument('-t', '--test', required=False, default='data/membrane/test/', help='path to test data set')
+    ap.add_argument('-s', '--steps', required=False, type=int, default=10, help='steps per epoch for train')
+    ap.add_argument('-e', '--epochs', required=False, type=int, default=5, help='epochs for train model')
     args = vars(ap.parse_args())
 
     # 多GPU情况下进行分布式训练
@@ -38,12 +40,11 @@ def just_do_it():
         fill_mode='nearest'
     )
     aug = AUGMENTATION()
-    generator = aug.train_generator(2, args['train'], 'images', 'ground_truth', data_gen_args,
-                                    save_to_dir=None)
+    generator = aug.train_generator(2, args['train'], 'images', 'ground_truth', data_gen_args, save_to_dir=None)
     with strategy.scope():
         model = u_net()
     model_checkpoint = ModelCheckpoint('u-net.hdf5', monitor='loss', verbose=1, save_best_only=True)
-    model.fit(generator, steps_per_epoch=10, epochs=5, callbacks=[model_checkpoint])
+    model.fit(generator, steps_per_epoch=args['steps'], epochs=args['epochs'], callbacks=[model_checkpoint])
 
     test_generator_ = aug.test_generator(args['test'])
     results = model.predict(test_generator_, 30, verbose=1)
